@@ -1,0 +1,2699 @@
+{
+    "69": {
+        "name": "Copy of (#58) Account Balances Records -",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances \nWHERE\n  holder_address = '{{ account_address }}'\nAND \n  token_address = '{{ token_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            },
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "8": {
+        "name": "Daily Gas Used",
+        "description": "Shows Daily Gas Used",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n  toString(toDate(FROM_UNIXTIME(timestamp))) as date,\n  SUM(gas_used) AS daily_gas_used\nFROM\n  {{network}}.blocks\nWHERE\n     timestamp >= start_ts\n     and\n     timestamp <= end_ts\nGROUP BY\n  date\nORDER BY\n  date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_this_month"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Daily Gas Used::CHART"
+        ]
+    },
+    "32": {
+        "name": "ERC20 Daily Token Transfer by Token",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    count(transaction_hash) AS erc20_txs\nFROM\n    {{network}}.token_transfers\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\n    AND\n    token_address = LOWER('{{ token_address_requested }}')\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            },
+            {
+                "title": "Token Address",
+                "name": "token_address_requested",
+                "type": "text",
+                "locals": [],
+                "value": "0x826551890dc65655a0aceca109ab11abdbd7a07b"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "18": {
+        "name": "New Query",
+        "description": null,
+        "SQL": "select * from dex_etl.7700_blocks limit 10",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "81": {
+        "name": "Historical Gas Fee By Day",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    avg(max_fee_per_gas)/pow(10,18) AS avg_max_fee\nFROM\n    {{ network }}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_30_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Historical Average Gas Fee::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "64": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "82": {
+        "name": "Most Gas Spenders",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    from_address, SUM(gas * gas_price)/pow(10,18) as total_gas_used\nFROM\n    {{ network }}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    from_address, block_timestamp\nORDER BY\n    total_gas_used DESC\nLIMIT 50\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_30_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Most Gas Spenders Distribution::CHART"
+        ]
+    },
+    "11": {
+        "name": "Active Addresses",
+        "description": null,
+        "SQL": "SELECT \n    COUNT(DISTINCT from_address) AS active_addresses\nFROM\n  {{network}}.transactions",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Active Addresses::COUNTER",
+            "Table::TABLE"
+        ]
+    },
+    "12": {
+        "name": "Smart Contracts",
+        "description": null,
+        "SQL": "SELECT \n    COUNT(DISTINCT address) AS contract_addresses\nFROM\n  {{network}}.logs",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Smart Contracts::COUNTER"
+        ]
+    },
+    "39": {
+        "name": "Copy of (#31) Network Average Gas Utilization",
+        "description": "The data in this query represents the average gas utilization percentage for last 90 days. The query calculates the average gas utilization by dividing the gas used by the gas limit for each transaction, and then multiplying it by the number of transactions. This value is then multiplied by 100 to get the percentage.",
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(timestamp))) as date,\r\n    round(avg((gas_used / gas_limit) * transaction_count) * 100, 2) as avg_gas_utilization_percentage\r\nFROM\r\n    dex_etl.{{ chain_id }}_blocks\r\nWHERE\r\n    timestamp >= start_ts\r\n    AND\r\n    timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_30_days"
+            },
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "70": {
+        "name": "Warehouse Contracts Page Query",
+        "description": null,
+        "SQL": "SELECT from_address, hash, to_address \n\nFROM {{ network }}.transactions \nWHERE hash = '{{ transaction_hash }}'\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 0
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 10
+            },
+            {
+                "title": "transaction_hash",
+                "name": "transaction_hash",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0xa3cb03244212850d312b29296870406a1875be4c7eba688f0d47b9406dad05ee"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "13": {
+        "name": "Copy of (#1) Transactions Count",
+        "description": null,
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n  toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n  COUNT() AS transactions,\n  COUNT(DISTINCT from_address) AS active_addresses,\n  COUNT(DISTINCT receipt_contract_address) AS active_smart_contracts\nFROM\n  dex_etl.`{{ chain_id }}_transactions`\nWHERE\n     block_timestamp >= start_ts\n     and\n      block_timestamp <= end_ts\nGROUP BY\n  date\nORDER BY\n  date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": {
+                    "start": "2023-04-06",
+                    "end": "2023-05-10"
+                }
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Transactions/Active Addresses/Active Smart contracts::CHART"
+        ]
+    },
+    "14": {
+        "name": "Total Transactions Hashes",
+        "description": null,
+        "SQL": "SELECT count(hash)\nFROM \n    {{network}}.transactions;\n",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Transactions Hashes Count::COUNTER"
+        ]
+    },
+    "19": {
+        "name": "Unique Addresses",
+        "description": null,
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n  toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n  COUNT() AS transactions,\n  COUNT(DISTINCT from_address) AS active_addresses,\n  COUNT(DISTINCT receipt_contract_address) AS active_smart_contracts\nFROM\n  dex_etl.`{{ chain_id }}_transactions`\nWHERE\n     block_timestamp >= start_ts\n     and\n      block_timestamp <= end_ts\nGROUP BY\n  date\nORDER BY\n  date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": {
+                    "start": "2023-04-06",
+                    "end": "2023-05-10"
+                }
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Transactions/Active Addresses/Active Smart contracts::CHART"
+        ]
+    },
+    "71": {
+        "name": "Blocks Warehouse Page Query",
+        "description": null,
+        "SQL": "SELECT number, timestamp, gas_limit, gas_used, size, base_fee_per_gas, extra_data, hash, parent_hash, state_root, nonce\n\nFROM {{ network }}.blocks\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 10
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 0
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "72": {
+        "name": "Address Warehouse Page Query",
+        "description": null,
+        "SQL": "SELECT from_address, value, hash, block_number, block_timestamp, to_address\n\nFROM {{ network }}.transactions\nWHERE from_address = '{{ address }}'\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 0
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 10
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0xa73141eb2b5785a846f7c92cb94b42aa82ff350b"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "65": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "35": {
+        "name": "Native Tokens",
+        "description": null,
+        "SQL": "SELECT \r\n    chain_id AS value, \r\n    IF(chain_id = 10, '0x4200000000000000000000000000000000000006',\r\n        IF(chain_id = 250, '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',\r\n            IF(chain_id = 7700, '0x826551890dc65655a0aceca109ab11abdbd7a07b',\r\n                IF(chain_id = 100, '0x9c58bacc331c9aa871afd802db6379a98e80cedb',\r\n                    IF(chain_id = 42161, '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',\r\n                        IF(chain_id = 42170, '0x722e8bdd2ce80a4422e880164f2079488e115365', NULL)\r\n                    )\r\n                )\r\n            )\r\n        )\r\n    ) AS name\r\nFROM dex_etl.chains",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "9": {
+        "name": "Blocks",
+        "description": null,
+        "SQL": "SELECT\n  *\nFROM\n  {{network}}.blocks\nORDER BY\n  number DESC\nLIMIT\n  10",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "74": {
+        "name": "Address Warehouse Page ERC-20 TXs",
+        "description": null,
+        "SQL": "SELECT transaction_hash, block_timestamp, from_address, to_address, value, token_address\nFROM {{ network }}.token_transfers\nWHERE from_address = LOWER('{{ address }}')\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x7ad9e1e68f89047176f95900738c3a7b6606129f"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "66": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "16": {
+        "name": "Last Block Ago",
+        "description": null,
+        "SQL": "SELECT toUnixTimestamp(now()) - toUnixTimestamp(timestamp) AS seconds_ago, number, timestamp\nFROM dex_etl.`{{ chain_id }}_blocks`\nORDER BY timestamp DESC\nLIMIT 1",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "locals": [],
+                "queryId": 2,
+                "value": "10"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "20": {
+        "name": "Unique Addresses",
+        "description": null,
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    uniqCombined(from_address) AS unique_addresses\nFROM\n    {{network}}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_7_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique Addresses Chart::CHART"
+        ]
+    },
+    "96": {
+        "name": "Number of daily transfers for a token, 7d",
+        "description": null,
+        "SQL": "SELECT\n    toDate(block_timestamp) AS transaction_date,\n    count() AS transfer_count\nFROM\n    {{ network }}.token_transfers\nWHERE\n    token_address = lower('{{token_address_requested}}')\n    AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\nGROUP BY\n    transaction_date\nORDER BY\n    transaction_date;\n",
+        "parameters": [
+            {
+                "title": "token_address_requested",
+                "name": "token_address_requested",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "89": {
+        "name": "New Query",
+        "description": null,
+        "SQL": "show create base.blocks",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "22": {
+        "name": "Daily Transactions",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    count(hash) as txs_per_day\r\nFROM\r\n    `{{ network }}`.transactions\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_week"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "base"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Daily Transactions Chart::CHART"
+        ]
+    },
+    "23": {
+        "name": "Average Transaction Size",
+        "description": "The data obtained from the query includes the average TXs size per day for the last 90 days. Transaction size value is based on logs number.",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    avg(receipt_logs_count) AS tx_size   \nFROM\n   {{network}}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "36": {
+        "name": "token balance for address",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\n    IF(chain_id = 10, '0x4200000000000000000000000000000000000006',\r\n        IF(chain_id = 250, '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',\r\n            IF(chain_id = 7700, '0x826551890dc65655a0aceca109ab11abdbd7a07b',\r\n                IF(chain_id = 100, '0x9c58bacc331c9aa871afd802db6379a98e80cedb',\r\n                    IF(chain_id = 42161, '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',\r\n                        IF(chain_id = 42170, '0x722e8bdd2ce80a4422e880164f2079488e115365', NULL)\r\n                    )\r\n                )\r\n            )\r\n        )\r\n    ) AS native_token_address\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    count(hash) as txs_per_day\r\nFROM\r\n    dex_etl.`{{ chain_id }}_token_balance`\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\n    AND\r\n    holder_address = LOWER('{{ address }}')\r\n    AND\r\n    token_address = LOWER(native_token_address)\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "250"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "locals": [],
+                "value": "0x61e1A8041186CeB8a561F6F264e8B2BB2E20e06D"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Daily Transactions Chart by address::CHART"
+        ]
+    },
+    "76": {
+        "name": "All Transactions Page ERC-20 tab",
+        "description": null,
+        "SQL": "SELECT transaction_hash, block_timestamp, from_address, to_address, value, token_address\nFROM {{ network }}.token_transfers\n\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "90": {
+        "name": "New Query",
+        "description": null,
+        "SQL": "create show base.blocks",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "28": {
+        "name": "Average Gas Price",
+        "description": "The data obtained from the query includes the average gas price in Native Token for that network (`average_gas_price`) for each date for last 90 days. The results are grouped by date and ordered in ascending order. This information helps analyze trends and fluctuations in gas prices over time on the network.",
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    avg(receipt_effective_gas_price) / 1000000000 AS average_gas_price   \r\nFROM\r\n    {{network}}.transactions\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Chart::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "21": {
+        "name": "ERC20 Daily Token Transfer",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    count(transaction_hash) AS erc20_txs\nFROM\n    {{network}}.token_transfers\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_12_months"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Chart::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "95": {
+        "name": "Number of Unique Address Transfers, 7d",
+        "description": null,
+        "SQL": "WITH from_addresses AS (\n    SELECT\n        toDate(block_timestamp) AS transaction_date,\n        count(DISTINCT from_address) AS unique_address_count\n    FROM\n        {{ network }}.token_transfers\n    WHERE\n        token_address = lower('{{ token_address_requested }}')\n        AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\n    GROUP BY\n        transaction_date\n),\nto_addresses AS (\n    SELECT\n        toDate(block_timestamp) AS transaction_date,\n        count(DISTINCT to_address) AS unique_address_count\n    FROM\n        {{ network }}.token_transfers\n    WHERE\n        token_address = lower('{{ token_address_requested }}')\n        AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\n    GROUP BY\n        transaction_date\n)\nSELECT\n    from_addresses.transaction_date AS date,\n    from_addresses.unique_address_count AS token_sender_address_count,\n    to_addresses.unique_address_count AS token_receiver_address_count\nFROM\n    from_addresses\nJOIN\n    to_addresses ON from_addresses.transaction_date = to_addresses.transaction_date\nORDER BY\n    date;\n",
+        "parameters": [
+            {
+                "title": "token_address_requested",
+                "name": "token_address_requested",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "7700"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "77": {
+        "name": "Copy of (#76) Transactions  ERC-20  Warehouse Page",
+        "description": null,
+        "SQL": "SELECT transaction_hash, block_timestamp, from_address, to_address, value, token_address\nFROM {{ network }}.token_transfers\n\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "85": {
+        "name": "Daily transactions by address, 7d",
+        "description": "Shows daily number of transactions over the last 7 days for a particular address.",
+        "SQL": "SELECT\n    toDate(block_timestamp) AS transaction_date,\n    count() AS transaction_count\nFROM\n    base.transactions_address\nWHERE\n    address = '{{ address }}'\n    AND block_timestamp >= now() - INTERVAL 7 DAY\nGROUP BY\n    transaction_date\nORDER BY\n    transaction_date;",
+        "parameters": [
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0xa61301a5199671ab6c5d2e21c718fddbdab778e3"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "91": {
+        "name": "DAI Daily Unique Sender Addresses, 7d",
+        "description": null,
+        "SQL": "SELECT\n    toDate(block_timestamp) AS transaction_date,\n    count(DISTINCT from_address) AS unique_address_count\nFROM\n    base.token_transfers\nWHERE\n    token_address = lower('{{ token_address }}')\n    AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\nGROUP BY\n    transaction_date\nORDER BY\n    transaction_date;",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "24": {
+        "name": "New Query",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates}}')) AS start_ts,\r\n\r\nselect \r\n    *\r\nfrom \r\n    dex_etl.7700_token_transfers \r\nWHERE\r\n    block_timestamp >= start_ts",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date",
+                "global": false,
+                "locals": [],
+                "value": "2022-08-05"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "25": {
+        "name": "Average Block Size",
+        "description": "The data obtained from the query includes the average block size per day for the last 90 days. The block size refers to the amount of data that is stored in each block of the blockchain.",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(timestamp))) as date,\n    avg(size) AS average_block_size\nFROM\n    {{network}}.blocks\nWHERE\n    timestamp >= start_ts\n    AND\n    timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_7_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "26": {
+        "name": "Copy of (#25) Average Block Size",
+        "description": null,
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(timestamp))) as date,\n    avg(size) AS average_block_size\nFROM\n    dex_etl.`{{ chain_id }}_blocks`\nWHERE\n    timestamp >= start_ts\n    AND\n    timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_this_week"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "27": {
+        "name": "Average Gas Limit",
+        "description": "The data obtained from the given query includes the average gas limit per day for the last 90 days. This information helps to analyze the average gas limit trends and variations over time on the network.",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(timestamp))) as date,\n    avg(gas_limit) AS average_gas_limit\nFROM\n    {{network}}.blocks\nWHERE\n    timestamp >= start_ts\n    AND\n    timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Chart::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "29": {
+        "name": "Smart Contract Events Issued",
+        "description": "Gives count of Smart Contract Events issued over time from address",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toDate(FROM_UNIXTIME(t.block_timestamp)) AS day,\n    count() AS events_count\nFROM\n    {{network}}.logs l\nJOIN\n    {{network}}.transactions t ON l.transaction_hash = t.hash\nWHERE\n    l.address='{{address}}'\n    AND\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    day\nORDER BY\n    day\n",
+        "parameters": [
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x03cd777f7da9ee2884fc2fd111808467c4df0203"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_week"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Chart::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "30": {
+        "name": "Daily Transactions by Address",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    count(hash) as txs_per_day\r\nFROM\r\n    {{network}}.transactions\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\n    AND\r\n    (from_address = LOWER('{{ address }}') OR to_address = LOWER('{{ address }}'))\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "locals": [],
+                "value": "0xb8ff877ed78ba520ece21b1de7843a8a57ca47cb"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Daily Transactions Chart by address::CHART"
+        ]
+    },
+    "78": {
+        "name": "Transaction Page Overview",
+        "description": null,
+        "SQL": "SELECT hash, block_number, block_timestamp, from_address, to_address, value, gas, gas_price, input\nFROM {{ network }}.transactions\nWHERE hash = LOWER('{{ tx_hash }}')",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "tx_hash",
+                "name": "tx_hash",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x0587a1c11d28bbbaa8e54bf9017ed1061dcca78e88e95ba5b853fc543fcfe0aa"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "79": {
+        "name": "Copy of (#78) Transaction by hash Page Main Data",
+        "description": null,
+        "SQL": "SELECT hash, block_number, block_timestamp, from_address, to_address, value, gas, gas_price, input\n\nFROM {{ network }}.transactions\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "31": {
+        "name": "Network Average Gas Utilization",
+        "description": "The data in this query represents the average gas utilization percentage for last 90 days. The query calculates the average gas utilization by dividing the gas used by the gas limit for each transaction, and then multiplying it by the number of transactions. This value is then multiplied by 100 to get the percentage.",
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(timestamp))) as date,\r\n    round(avg((gas_used / gas_limit) * transaction_count) * 100, 2) as avg_gas_utilization_percentage\r\nFROM\r\n    {{network}}.blocks\r\nWHERE\r\n    timestamp >= start_ts\r\n    AND\r\n    timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_30_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "33": {
+        "name": "Daily Gas Used",
+        "description": "The data obtained from the query includes the total gas in GWEI (aCANTO for Canto network) for that network (`total_gas`) for each date for the last 90 days. The results are grouped by date and ordered in ascending order. This information helps analyze trends and fluctuations in gas used over time on the network.",
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    count(gas) as total_gas\r\nFROM\r\n   {{ network }}.transactions\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_30_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Daily Gas Used::CHART"
+        ]
+    },
+    "44": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "10": {
+        "name": "Transactions",
+        "description": "",
+        "SQL": "SELECT\n  *\nFROM\n  {{network}}.transactions\nORDER BY\n  block_number DESC\nLIMIT\n  10",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "34": {
+        "name": "Copy of (#30) Daily Transactions by address",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    count(hash) as txs_per_day\r\nFROM\r\n    dex_etl.`{{ chain_id }}_transactions`\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\n    AND\r\n    (from_address = LOWER('{{ address }}') OR to_address = LOWER('{{ address }}'))\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC{{ native_token }}",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "locals": [],
+                "value": "0x61e1A8041186CeB8a561F6F264e8B2BB2E20e06D"
+            },
+            {
+                "title": "Native Token",
+                "name": "native_token",
+                "type": "text",
+                "locals": [],
+                "value": "7700"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Daily Transactions Chart by address::CHART"
+        ]
+    },
+    "37": {
+        "name": "Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    {{network}}.token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Unique ERC20 Addresses::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "38": {
+        "name": "Average Transaction Fee Chart",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    avg(max_fee_per_gas) / 1000000000 AS avg_max_fee\nFROM\n    {{network}}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_12_months"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "40": {
+        "name": "Copy of (#31) Network Average Gas Utilization",
+        "description": "The data in this query represents the average gas utilization percentage for last 90 days. The query calculates the average gas utilization by dividing the gas used by the gas limit for each transaction, and then multiplying it by the number of transactions. This value is then multiplied by 100 to get the percentage.",
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(timestamp))) as date,\r\n    round(avg((gas_used / gas_limit) * transaction_count) * 100, 2) as avg_gas_utilization_percentage\r\nFROM\r\n    dex_etl.{{ chain_id }}_blocks\r\nWHERE\r\n    timestamp >= start_ts\r\n    AND\r\n    timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_30_days"
+            },
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "41": {
+        "name": "Token Transfers Value",
+        "description": null,
+        "SQL": "WITH toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\ntoUnixTimestamp(toString('{{dates.end}}')) AS end_ts,\nLOWER('{{ token_address_requested }}') as address\nSELECT\n  toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n  SUM(value) as token_quantity\nFROM\n  dex_etl.`{{ chain_id }}_token_transfers`\nWHERE\n  block_timestamp >= start_ts\n  AND block_timestamp <= end_ts\n  AND\n    token_address = address\nGROUP BY\n    date\nORDER BY\n  date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "token_address_requested",
+                "name": "token_address_requested",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Token Transfers Value::CHART"
+        ]
+    },
+    "42": {
+        "name": "Copy of (#41) Token Transfers Value",
+        "description": null,
+        "SQL": "WITH toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\ntoUnixTimestamp(toString('{{dates.end}}')) AS end_ts,\nLOWER('{{ token_address_requested }}') as address\nSELECT\n  toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n  SUM(value) as token_quantity\nFROM\n  dex_etl.`{{ chain_id }}_token_transfers`\nWHERE\n  block_timestamp >= start_ts\n  AND block_timestamp <= end_ts\n  AND\n    token_address = address\nGROUP BY\n    date\nORDER BY\n  date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_90_days"
+            },
+            {
+                "title": "token_address_requested",
+                "name": "token_address_requested",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Token Transfers Value::CHART"
+        ]
+    },
+    "46": {
+        "name": "Copy of (#21) ERC20 Daily Token Transfer",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    count(transaction_hash) AS erc20_txs\nFROM\n    dex_etl.`{{ chain_id }}_token_transfers`\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_12_months"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "47": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "15": {
+        "name": "Last Block Indexed",
+        "description": null,
+        "SQL": "SELECT\n  toUnixTimestamp(now()) - toUnixTimestamp(timestamp) AS seconds_ago,\n  number, timestamp\nFROM\n  {{network}}.blocks\nORDER BY\n  timestamp DESC\nLIMIT\n  1",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "80": {
+        "name": "Copy of (#79) Copy of (#78) Transaction by hash Page Main Data",
+        "description": null,
+        "SQL": "SELECT hash, block_number, block_timestamp, from_address, to_address, value, gas, gas_price, input\n\nFROM {{ network }}.transactions\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "17": {
+        "name": "Count Chains",
+        "description": null,
+        "SQL": "select count(*) from dex_etl.chains",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "2": {
+        "name": "Chains Supported",
+        "description": null,
+        "SQL": "SELECT chain_id as `value`, network as `name`\nFROM dex_etl.chains",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "92": {
+        "name": "DAI Daily Receiver Addresses, 7d",
+        "description": null,
+        "SQL": "SELECT\n    toDate(block_timestamp) AS transaction_date,\n    count(DISTINCT to_address) AS unique_address_count\nFROM\n    base.token_transfers\nWHERE\n    token_address = lower('{{ token_address }}')\n    AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\nGROUP BY\n    transaction_date\nORDER BY\n    transaction_date;",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "56": {
+        "name": "Networks Supported",
+        "description": null,
+        "SQL": "SELECT network as `value`, concat(network, ' ', toString(chain_id)) as `name`\nFROM dex_etl.chains",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "4": {
+        "name": "Top Event Types Emmitted",
+        "description": null,
+        "SQL": "SELECT \n    topic, \n    COUNT(*) AS count\nFROM \n    (\n        SELECT \n            arrayJoin(topics) AS topic\n        FROM \n          {{network}}.logs\n    )\nGROUP BY \n    topic\nORDER BY \n    count DESC\nLIMIT 10;\n",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Top Events Signatures::CHART",
+            "Table::TABLE"
+        ]
+    },
+    "48": {
+        "name": "Copy of (#32) ERC20 Daily Token Transfer by Token",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    count(transaction_hash) AS erc20_txs\nFROM\n    dex_etl.`{{ chain_id }}_token_transfers`\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\n    AND\n    token_address = LOWER('{{ token_address_requested }}')\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            },
+            {
+                "title": "Token Address",
+                "name": "token_address_requested",
+                "type": "text",
+                "locals": [],
+                "value": "0x826551890dc65655a0aceca109ab11abdbd7a07b"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "49": {
+        "name": "Copy of (#32) ERC20 Daily Token Transfer by Token",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    count(transaction_hash) AS erc20_txs\nFROM\n    dex_etl.`{{ chain_id }}_token_transfers`\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\n    AND\n    token_address = LOWER('{{ token_address_requested }}')\nGROUP BY\n    date\nORDER BY\n    date ASC\n",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            },
+            {
+                "title": "Token Address",
+                "name": "token_address_requested",
+                "type": "text",
+                "locals": [],
+                "value": "0x826551890dc65655a0aceca109ab11abdbd7a07b"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "50": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "45": {
+        "name": "Historical Gas Fee By Hour",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    concat(leftPad(toString(toHour(FROM_UNIXTIME(block_timestamp))),2,'0'),':00') as hour,\n    avg(max_fee_per_gas)/1000000000 AS avg_max_fee\nFROM\n    {{ network }}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date, hour\nORDER BY\n    date ASC, hour ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "datetime-range-with-seconds",
+                "global": false,
+                "locals": [],
+                "value": "d_last_14_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Average Gas Fee By Hour::CHART"
+        ]
+    },
+    "51": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "52": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART",
+            "Chart::CHART"
+        ]
+    },
+    "53": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "97": {
+        "name": "DAI Number of Transfers with Unique Address, 7d (to and from combined)",
+        "description": null,
+        "SQL": "SELECT\n    transaction_date,\n    COUNT(DISTINCT address) AS total_unique_address_count\nFROM (\n    SELECT\n        toDate(block_timestamp) AS transaction_date,\n        from_address AS address\n    FROM\n        base.token_transfers\n    WHERE\n        token_address = lower('{{ token_address }}')\n        AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\n    UNION ALL\n    SELECT\n        toDate(block_timestamp) AS transaction_date,\n        to_address AS address\n    FROM\n        base.token_transfers\n    WHERE\n        token_address = lower('{{ token_address }}')\n        AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\n)\nGROUP BY\n    transaction_date\nORDER BY\n    transaction_date;\n",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "6": {
+        "name": "Total Transactions",
+        "description": null,
+        "SQL": "SELECT \n    SUM(transaction_count) AS total_transaction_count\nFROM \n    {{network}}.blocks;\n",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Transactions Count::COUNTER",
+            "Table::TABLE"
+        ]
+    },
+    "86": {
+        "name": "Number of daily transfers for a token, 7d",
+        "description": null,
+        "SQL": "SELECT\n    toDate(block_timestamp) AS transaction_date,\n    count() AS transfer_count\nFROM\n    base.token_transfers\nWHERE\n    token_address = lower('{{token_address}}')\n    AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\nGROUP BY\n    transaction_date\nORDER BY\n    transaction_date;\n",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "93": {
+        "name": "Name, Symbol and Token Supply",
+        "description": "",
+        "SQL": "SELECT\n    name\nFROM\n    base.tokens\nWHERE\n    address = lower('{{ token_address }}')\nLIMIT 1;\n\n\n",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "87": {
+        "name": "New Query",
+        "description": null,
+        "SQL": "SELECT\n    token_address,\n    chain_id,\n    price_stable.2 AS stable_price\nFROM dex.last_price_v01\nWHERE token_address = '{{ token_address }}' AND \nchain_id = '{{ chain_id }}'\n",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949a6f0c72e6c4a641f24049a917db0cb"
+            },
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "8453"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "73": {
+        "name": "All Blocks Page",
+        "description": "all_blocks_pagination",
+        "SQL": "    SELECT DISTINCT number, timestamp, miner, gas_limit, gas_used, transaction_count, base_fee_per_gas\n    \n    FROM {{network}}.blocks\n    LIMIT {{first}} OFFSET {{skip}}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100\n",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 0
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "88": {
+        "name": "DAI daily transfers with unique addresses (senders vs receivers)",
+        "description": null,
+        "SQL": "WITH from_addresses AS (\n    SELECT\n        toDate(block_timestamp) AS transaction_date,\n        count(DISTINCT from_address) AS unique_address_count\n    FROM\n        base.token_transfers\n    WHERE\n        token_address = lower('{{ token_address }}')\n        AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\n    GROUP BY\n        transaction_date\n),\nto_addresses AS (\n    SELECT\n        toDate(block_timestamp) AS transaction_date,\n        count(DISTINCT to_address) AS unique_address_count\n    FROM\n        base.token_transfers\n    WHERE\n        token_address = lower('{{ token_address }}')\n        AND block_timestamp >= toUInt32(now() - INTERVAL 7 DAY)\n    GROUP BY\n        transaction_date\n)\nSELECT\n    from_addresses.transaction_date AS date,\n    from_addresses.unique_address_count AS token_sender_address_count,\n    to_addresses.unique_address_count AS token_receiver_address_count\nFROM\n    from_addresses\nJOIN\n    to_addresses ON from_addresses.transaction_date = to_addresses.transaction_date\nORDER BY\n    date;\n",
+        "parameters": [
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "94": {
+        "name": "Copy of (#45) Historical Gas Fee By Hour",
+        "description": "",
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n    concat(leftPad(toString(toHour(FROM_UNIXTIME(block_timestamp))),2,'0'),':00') as hour,\n    avg(max_fee_per_gas)/1000000000 AS avg_max_fee\nFROM\n    {{ network }}.transactions\nWHERE\n    block_timestamp >= start_ts\n    AND\n    block_timestamp <= end_ts\nGROUP BY\n    date, hour\nORDER BY\n    date ASC, hour ASC\n",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "datetime-range-with-seconds",
+                "global": false,
+                "locals": [],
+                "value": "d_last_7_days"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Average Gas Fee By Hour::CHART"
+        ]
+    },
+    "75": {
+        "name": "All Transactions Page",
+        "description": "",
+        "SQL": "SELECT hash, block_number, block_timestamp, from_address, to_address, value\nFROM {{ network }}.transactions\n\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "7": {
+        "name": "Transactions Per Minute",
+        "description": null,
+        "SQL": "WITH toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\ntoUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n  AVG(transaction_count) AS avg_transactions_per_minute\nFROM\n  (\n    SELECT\n      toStartOfMinute(FROM_UNIXTIME(timestamp)) AS minute,\n      SUM(transaction_count) AS transaction_count\n    FROM\n      {{network}}.blocks\n    WHERE\n      timestamp >= start_ts\n      and timestamp <= end_ts\n    GROUP BY\n      minute\n  )",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": {
+                    "start": "2023-04-06",
+                    "end": "2023-05-10"
+                }
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Transactions Per Minute(TPM)::COUNTER"
+        ]
+    },
+    "57": {
+        "name": "Wallet Balance",
+        "description": null,
+        "SQL": "WITH balances AS (\n  SELECT\n    token_address,\n    toUInt32(7700) as chain_id,\n    max((block_timestamp, value)).1 as timestamp,\n    max((block_timestamp, value)).2 as balance,\n    token_standard\n  FROM\n    canto.`token_balances`\n  WHERE\n    holder_address = '0x1d20635535307208919f0b67c3b2065965a85aa9'\n  GROUP BY\n    token_address,\n    token_standard\n  HAVING\n    balance > 0\n),\ninventory AS (\n  SELECT\n    *\n  FROM\n    dex.`inventory_synthetic_v1`\n  WHERE\n    (address, chain_id) global IN (\n      SELECT\n        token_address,\n        chain_id\n      FROM\n        balances\n    )\n    AND contract_type = 'token'\n),\nprices AS (\n  SELECT\n    token_address,\n    chain_id,\n    max(price_stable) as price\n  FROM\n    dex.`last_price_v01`\n  WHERE\n    (token_address, chain_id) global IN (\n      SELECT\n        token_address,\n        chain_id\n      FROM\n        balances\n    )\n  GROUP BY\n    chain_id,\n    token_address\n)\nSELECT\n  b.token_address as token_address,\n  b.chain_id as chain_id,\n  b.token_standard as token_standard,\n  b.timestamp as timestamp,\n  b.balance / POWER(10, i.decimals) as balance,\n  i.name as name,\n  i.symbol [-1] as symbol,\n  i.decimals as decimals,\n  i.logo [-1] as logo,\n  p.price.2 as price\nFROM\n  balances as b\n  LEFT JOIN inventory as i ON (\n    b.token_address = i.address\n    AND b.chain_id = i.chain_id\n  )\n  LEFT JOIN prices as p ON (\n    b.token_address = p.token_address\n    AND b.chain_id = p.chain_id\n  )",
+        "parameters": [],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "84": {
+        "name": "Address Warehouse Page NFT TXs",
+        "description": null,
+        "SQL": "SELECT transaction_hash, block_timestamp, from_address, to_address, value, token_address\nFROM {{ network }}.token_transfers\nWHERE from_address = LOWER('{{ address }}') AND is_nft=1\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x7732049f65611d0868e0da6f943841f0d3071a6b"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "43": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "83": {
+        "name": "All Transactions Page NFT tab",
+        "description": null,
+        "SQL": "SELECT transaction_hash, block_timestamp, from_address, to_address, value, token_address\nFROM {{ network }}.token_transfers\nWHERE is_nft=1\nLIMIT {{ first }} OFFSET {{ skip }}",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            },
+            {
+                "title": "first",
+                "name": "first",
+                "type": "enum",
+                "global": false,
+                "locals": [],
+                "enumOptions": "5\n10\n25\n50\n100",
+                "value": "5"
+            },
+            {
+                "title": "skip",
+                "name": "skip",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "54": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": null,
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    dex_etl.{{ chain_id }}_token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 2,
+                "value": "7700"
+            },
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART"
+        ]
+    },
+    "55": {
+        "name": "Copy of (#37) Unique ERC20 Addresses",
+        "description": "Unique ERC 20 Addresses",
+        "SQL": "WITH\r\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\r\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\r\nSELECT\r\n    toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\r\n    uniqCombined(from_address, to_address) AS unique_addresses\r\nFROM\r\n    {{ network }}.token_transfers\r\nWHERE\r\n    block_timestamp >= start_ts\r\n    AND\r\n    block_timestamp <= end_ts\r\nGROUP BY\r\n    date\r\nORDER BY\r\n    date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": "d_last_month"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Unique ERC20 Addresses::CHART",
+            "Chart::CHART"
+        ]
+    },
+    "1": {
+        "name": "Transactions Count",
+        "description": null,
+        "SQL": "WITH\n    toUnixTimestamp(toString('{{dates.start}}')) AS start_ts,\n    toUnixTimestamp(toString('{{dates.end}}')) AS end_ts\nSELECT\n  toString(toDate(FROM_UNIXTIME(block_timestamp))) as date,\n  COUNT() AS transactions,\n  COUNT(DISTINCT from_address) AS active_addresses,\n  COUNT(DISTINCT receipt_contract_address) AS active_smart_contracts\nFROM\n  {{network}}.transactions\nWHERE\n     block_timestamp >= start_ts\n     and\n      block_timestamp <= end_ts\nGROUP BY\n  date\nORDER BY\n  date ASC",
+        "parameters": [
+            {
+                "title": "dates",
+                "name": "dates",
+                "type": "date-range",
+                "global": false,
+                "locals": [],
+                "value": {
+                    "start": "2023-04-06",
+                    "end": "2023-05-10"
+                }
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Transactions/Active Addresses/Active Smart contracts::CHART"
+        ]
+    },
+    "3": {
+        "name": "Top Emitting Contracts",
+        "description": null,
+        "SQL": "SELECT \n    address, \n    COUNT(*) AS count\nFROM \n  {{network}}.logs\nGROUP BY \n    address\nORDER BY \n    count DESC\nLIMIT 10;",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Chart::CHART"
+        ]
+    },
+    "5": {
+        "name": "Last Block Number",
+        "description": null,
+        "SQL": "SELECT\n  max(number) as block_number\nFROM\n  {{network}}.blocks",
+        "parameters": [
+            {
+                "title": "network",
+                "name": "network",
+                "type": "query",
+                "global": false,
+                "locals": [],
+                "queryId": 56,
+                "value": "canto"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE",
+            "Last Block Number::COUNTER"
+        ]
+    },
+    "58": {
+        "name": "Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "59": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_adderss }}'\nGROUP BY\n  token_address,\n  token_standard\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_adderss",
+                "name": "account_adderss",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": null
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "60": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_adderss }}'\nGROUP BY\n  token_address,\n  token_standard\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_adderss",
+                "name": "account_adderss",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": null
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "61": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_adderss }}'\nGROUP BY\n  token_address,\n  token_standard\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_adderss",
+                "name": "account_adderss",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": null
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "62": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_adderss }}'\nGROUP BY\n  token_address,\n  token_standard\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_adderss",
+                "name": "account_adderss",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": null
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "63": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "67": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nAND \n  token_address = '{{ token_address }}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            },
+            {
+                "title": "token_address",
+                "name": "token_address",
+                "type": "number",
+                "global": false,
+                "locals": [],
+                "value": 7.348014686070067e+47
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    },
+    "68": {
+        "name": "Copy of (#58) Account Balances Records",
+        "description": null,
+        "SQL": "SELECT\n  token_address,\n  toUInt32({{ chain_id }}) as chain_id,\n  max((block_timestamp, value)).1 as timestamp,\n  max((block_timestamp, value)).2 as balance,\n  token_standard,\n  token_id\nFROM\n  {{ network }}.token_balances\nWHERE\n  holder_address = '{{ account_address }}'\nAND \n  address = '{{address}}'\nGROUP BY\n  token_address,\n  token_standard,\n  token_id\nHAVING\n  balance > 0",
+        "parameters": [
+            {
+                "title": "chain_id",
+                "name": "chain_id",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "7700"
+            },
+            {
+                "title": "network",
+                "name": "network",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "canto"
+            },
+            {
+                "title": "account_address",
+                "name": "account_address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x9571997a66d63958e1b3de9647c22bd6b9e7228c"
+            },
+            {
+                "title": "address",
+                "name": "address",
+                "type": "text",
+                "global": false,
+                "locals": [],
+                "value": "0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd"
+            }
+        ],
+        "visualizations": [
+            "Table::TABLE"
+        ]
+    }
+}
