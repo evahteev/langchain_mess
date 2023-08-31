@@ -76,7 +76,7 @@ async def main():
         descriptions_dict[query_id] = description
 
     # Save descriptions to JSON file
-    with open("descriptions.json", 'w') as f:
+    with open("query_descriptions.json", 'w') as f:
         json.dump(descriptions_dict, f, indent=4)
 
 
